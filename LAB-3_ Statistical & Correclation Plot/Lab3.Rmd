@@ -1,0 +1,104 @@
+---
+title: "CSE3020 Lab3"
+author: "Faraz Suhail"
+date: "08/02/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Name: "Faraz Suhail"
+## Reg. No.: "19BCE1525"
+
+```{r}
+#Import libraries
+library(ggplot2)
+library(ggExtra)
+library("tidyverse")
+```
+### Ques i. Construct of Scatterplot, Scatterplot With Encircling, Jitter Plot, Counts Chart, Bubble plot using R
+
+```{r}
+#ScatterPlot 
+orange <- data("Orange")
+gg<-ggplot(Orange,aes(x=age,y=circumference))+ geom_point()+ geom_smooth(method="loess",se=F)+ 
+    labs(subtitle="Age Vs Circumference",y="Circumference", x="Age", title="Scatterplot") 
+plot(gg)
+```
+
+
+```{r}
+#Jitter Plot
+plotj <- ggplot(Orange, aes(age, circumference)) + geom_point() + geom_smooth(method="lm", se=F) + 
+     labs(subtitle="Orange: age vs circumference", y="hwy", x="cty", title="Jitterplot", caption="Source: Orange")
+plot(plotj)
+```
+
+```{r}
+# Counts Plot 
+gc <- ggplot(Orange, aes(age, circumference)) + geom_count(col="tomato3", show.legend=F) + 
+  labs(subtitle="Orange: age vs circumference", y="Circumference", x="Age", title="Counts Plot")
+plot(gc)
+```
+
+```{r}
+#Histogram 
+o<-Orange
+theme_set(theme_bw()) 
+o_select<-o[o$age>=400 & o$age<1500, ]
+g<- ggplot(o,aes(age,circumference))+geom_count()+geom_smooth(method="lm",se=F) 
+ggMarginal(g, type = "histogram", fill="red")
+ggMarginal(g, type = "boxplot", fill="orange")
+```
+
+### Ques ii. Statistical Model using R with Orange dataset:
+
+### 1. Look at Orange using head. What type of data are each of the columns?
+
+```{r}
+head(Orange)
+str(orange)
+sapply(Orange,class)
+```
+### 2. Find the mean, standard deviation, and standard error of tree circumference.
+```{r}
+#mean
+mean(Orange$circumference)
+#standard deviation
+sd(Orange$circumference)
+#standard error
+sqrt(length(Orange$circumference))
+```
+### 3. Make a linear model which describes circumference (the response) as a function of age (the predictor). Save it as an object with <-, then print the object out by typing its name. What do those coefficients mean?
+
+```{r}
+#linear model describing the circumference as a function of age.
+model<-lm(circumference~age, data=Orange) 
+model
+```
+Coefficients are estimates of the unknown population parameters and describe the relationship between a predictor variable and the response. 
+
+### 4. Make another linear model describing age as a function of circumference. Save this as a different object.
+```{r}
+#linear model describing age as a function of circumference
+model2<-lm(age~circumference,data=Orange) 
+model2
+```
+
+### 5. Call summary() on both of your model objects. What do you notice?
+```{r}
+summary(model)
+summary(model2)
+```
+
+
+### Ques 6. Does this mean that trees growing makes them get older? Does a tree getting older make it grow larger? Or are these just correlations?
+
+### Ans: Yes, the trees are growing larger as they get older as evident by the coeffient being positive which means that the age is directly propotion to circumference.
+
+
+### Ques 7. Does the significant p value prove that trees growing makes them get older? Why not?
+
+### Ans: The p value is very small which means that there is no correlation and the hypothesis can be rejected.

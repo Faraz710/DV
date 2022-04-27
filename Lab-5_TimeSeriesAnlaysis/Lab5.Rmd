@@ -1,0 +1,144 @@
+---
+title: "CSE3020 Lab5"
+author: "Faraz Suhail"
+date: "02/03/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Name: "Faraz Suhail"
+## Reg. No.: "19BCE1525"
+
+```{r}
+library("TTR")
+library(forecast)
+library(magick)
+library(ggplot2)
+library(dplyr)
+```
+
+```{r}
+india <- read.csv("covid_india.csv")
+india$Date <- as.Date(india$Date,"%d-%b-%y")
+head(india)
+```
+
+### 1). You want to predict the last year monthly, weekly trend based on the RTPCR response, (i.e.) No. of +Ve cases and No. –Ve cases along with admitted and discharged trend.
+
+```{r}
+ggplot(india, aes(x=Date, y=Daily.Confirmed)) +
+  geom_line() + xlab("") + ylim(0, 500000)
+
+ggplot(india, aes(x=Date, y=Daily.Deceased)) +
+  geom_line() + xlab("") + ylim(0, 5000)
+
+ggplot(india, aes(x=Date, y=Daily.Recovered)) +
+  geom_line() + xlab("") + ylim(0, 500000)
+```
+
+### 2). Identify the death rate due to Covid-19
+
+```{r}
+india$death.rate<- india$Daily.Deceased / india$Daily.Confirmed
+deathRatetotal = max(india$Total.Deceased, na.rm = TRUE) / max(india$Total.Confirmed, na.rm = TRUE)
+print("Total death rate: ")
+print(deathRatetotal)
+```
+
+### 3). Compare the last year and this year trends with respect to 1st , 2nd and 3rd wave also forecast the 4th Wave impact in India
+
+```{r}
+ggplot(india, aes(x=Date, y=Daily.Confirmed)) +
+  geom_line() + ylab("2020 Daily Confirmed") + scale_x_date(limits = as.Date(c("2020-01-30", "2020-12-31")))
+ggplot(india, aes(x=Date, y=Daily.Confirmed)) +
+  geom_line() + ylab("2021 Daily Confirmed") + scale_x_date(limits = as.Date(c("2021-01-01", "2021-10-31")))
+```
+```{r}
+ggplot(india, aes(x=Date, y=Daily.Deceased)) +
+  geom_line() + ylab("2020 daily Confirmed") + scale_x_date(limits = as.Date(c("2020-01-30", "2020-12-31")))
+
+ggplot(india, aes(x=Date, y=Daily.Deceased)) +
+  geom_line() + ylab("2021 daily Confirmed") + scale_x_date(limits = as.Date(c("2021-01-01", "2021-10-31")))
+
+```
+```{r}
+ggplot(india, aes(x=Date, y=Daily.Recovered)) +
+  geom_line() + ylab("2020 daily Recovered") + scale_x_date(limits = as.Date(c("2020-01-30", "2020-12-31")))
+
+ggplot(india, aes(x=Date, y=Daily.Recovered)) +
+  geom_line() + ylab("2021 daily Recovered") + scale_x_date(limits = as.Date(c("2021-01-01", "2021-10-31")))
+```
+
+##### Inference: Wave 2 in 2021 is intensive i.e., sharp rise in confirmed cases, recovered cases and deceased cases is seen in all aspects, making these 2 waves alot similiar to each other except their intensity of affect
+
+
+```{r}
+fit <- auto.arima(india$Daily.Confirmed)
+forecastedValues <- forecast(fit, 31)
+
+plot(forecastedValues, main = "Graph with forecasting of upcoming Wave Daily cases Confirmed",
+col.main = "blue") 
+
+fit <- auto.arima(india$Daily.Deceased)
+forecastedValues <- forecast(fit, 31)
+
+plot(forecastedValues, main = "Graph with forecasting of upcoming Wave Daily Deceased",
+col.main = "blue") 
+ 
+
+fit <- auto.arima(india$Daily.Recovered)
+forecastedValues <- forecast(fit, 31)
+  
+plot(forecastedValues, main = "Graph with forecasting of upcoming Wave Daily Recovered",
+col.main = "blue") 
+ 
+```
+
+### 4). Construct the model using the Simple moving average, Exponential Moving Average and ARIMA to forecast the Covid19 Dataset.
+
+```{r}
+#Simple moving average
+SMA1 <- SMA(india$Daily.Confirmed,n=31)
+plot.ts(SMA1,ylab="SMA Daily Confirmed prediction",
+col.main = "blue")
+
+#Exponential Moving Average
+ema <-EMA(india$Daily.Confirmed,n=31)
+plot.ts(ema,ylab="EMA Daily Confirmed prediction",
+col.main = "blue") 
+
+# ARIMA
+fit <- auto.arima(india$Daily.Confirmed)
+forecastedValues <- forecast(fit, 31)
+  
+plot(forecastedValues, ylab = "ARIMA Daily Confirmed prediction",
+col.main = "blue") 
+```
+
+### 5). Show the all above implementation with the visual impact 
+
+```{r}
+fit <- auto.arima(india$Total.Confirmed)
+forecastedValues <- forecast(fit, 31)
+  
+  
+plot(forecastedValues, main = "Forecasting of upcoming Wave Total cases Confirmed",
+col.main = "blue") 
+ 
+fit <- auto.arima(india$Total.Deceased)
+forecastedValues <- forecast(fit, 31)
+  
+  
+plot(forecastedValues, main = "Forecasting of upcoming Wave Total Deceased",
+col.main = "blue") 
+
+fit <- auto.arima(india$Total.Recovered)
+forecastedValues <- forecast(fit, 31)
+  
+  
+plot(forecastedValues, main = "Forecasting of upcoming Wave Total Recovered",
+col.main = "blue") 
+```

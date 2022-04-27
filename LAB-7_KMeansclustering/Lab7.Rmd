@@ -1,0 +1,113 @@
+---
+title: "CSE3020 Lab7"
+author: "Faraz Suhail"
+date: "15/03/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Name: "Faraz Suhail"
+## Reg. No.: "19BCE1525"
+
+
+### 1. Choose number of the cluster centre and no. of clusters
+
+```{r}
+library(cluster)
+library(ClusterR)
+library(ggplot2)
+library(factoextra)
+library(shipunov)
+library(ggfortify)
+library(factoextra)
+```
+
+```{r}
+data = read.csv("protein.csv")
+head(data)
+```
+
+```{r}
+data1 = data[2:10]
+set.seed(240)
+k = kmeans(data1,centers = 3)
+k
+```
+
+### 2. Choose the plotting methods for visualizing results
+
+### a.To display Cluster : use plot( )
+
+```{r}
+plot(data$RedMeat,data$WhiteMeat,col = k$cluster,xlab="Red Meat",ylab = "White Meat")
+text(x=data$RedMeat,y=data$WhiteMeat,data$Country)
+
+plot(data$Eggs,data$Milk,col = k$cluster,xlab="Eggs",ylab = "Milk")
+text(x=data$Eggs,y=data$Milk,data$Country)
+
+plot(data$Fish,data$Cereals,col = k$cluster,xlab="Fish",ylab = "Cereals")
+text(x=data$Fish,y=data$Cereals,data$Country)
+
+plot(data$Starch,data$Nuts,col = k$cluster,xlab="Starch",ylab = "Nuts")
+text(x=data$Starch,y=data$Nuts,data$Country)
+
+plot(data$Nuts,data$Fr.Veg,col = k$cluster,xlab="Nuts",ylab = "Veg")
+text(x=data$Nuts,y=data$Fr.Veg,data$Country)
+
+
+ggplot(data,aes(x=RedMeat,y=WhiteMeat)) + geom_point(aes(color=k$cluster)) + labs(color = "Cluster") + geom_text(aes(label = Country))
+
+ggplot(data,aes(x=Eggs,y=Milk)) + geom_point(aes(color=k$cluster)) + labs(color = "Cluster") +  geom_text(aes(label = Country))
+
+ggplot(data,aes(x=Fish,y=Cereals)) + geom_point(aes(color=k$cluster)) + labs(color = "Cluster") + geom_text(aes(label = Country))
+
+ggplot(data,aes(x=Starch,y=Nuts)) + geom_point(aes(color=k$cluster)) + labs(color = "Cluster") + geom_text(aes(label = Country))
+
+ggplot(data,aes(x=Nuts,y=Fr.Veg)) + geom_point(aes(color=k$cluster)) + labs(color = "Cluster") + geom_text(aes(label = Country))
+```
+
+
+### b. To display cluster centre : library(factoextra) , function : fviz_cluster()
+
+```{r}
+fviz_cluster(k,data = data[2:10])
+```
+
+### c. Display cluster : use Clustergram(),autoplot()
+
+```{r}
+Clustergram(data1,maxcl = 3,nboot = FALSE,method = "kmeans",col = "#deeb34")
+autoplot(kmeans(data1,3),data=data1)
+```
+
+### d. Analyze all the resulting parameters of Kmeans clustering
+
+```{r}
+k$cluster
+k$centers
+k$totss
+k$withinss
+k$tot.withinss
+k$betweenss
+k$size
+k$iter
+k$ifault
+ggplot(k,aes(k$cluster,fill = cluster)) + geom_histogram(stat = "count")  + xlab("Cluster") + ylab("Size")
+```
+
+### e. Determining Optimal Clusters
+
+1.Elbow method
+
+2.Silhouette method
+
+3.Gap statistic
+
+```{r}
+fviz_nbclust(data1, kmeans, method = "wss") +   geom_vline(xintercept = 4, linetype = 2) + labs(subtitle = "Elbow method")
+fviz_nbclust(data1, kmeans, method = "silhouette")+ labs(subtitle = "Silhouette method")
+fviz_nbclust(data1, kmeans, nstart = 25,  method = "gap_stat", nboot = 50)+ labs(subtitle = "Gap statistic method")
+```

@@ -1,0 +1,143 @@
+---
+title: "CSE3020 Lab6"
+author: "Faraz Suhail"
+date: "11/03/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Name: "Faraz Suhail"
+## Reg. No.: "19BCE1525"
+
+
+```{r}
+library(igraph)
+```
+
+1. Read the given adjacency matrix into R (Adjacency.csv)
+
+2. Read the given edge matrix into R(Edges.csv)
+
+```{r}
+matrix = read.csv("Lab6-DataSet_Adjacency.csv")
+edge = read.csv("Lab6-DataSet_Edges.csv")
+head(matrix)
+head(edge)
+rownames(matrix) = seq(2000, 2010, length.output = 11)
+```
+
+3. Create and plot the graph from the adjacency matrix and edge matrix (customize the vertex color edge size, vertex frame and label)
+
+```{r}
+matrix1 = matrix[2:12]
+colnames(matrix1) = seq(2000, 2010, length.output = 11) 
+head(matrix1)
+```
+
+```{r}
+matrix1 = data.matrix(matrix1)
+head(matrix1)
+g = graph_from_adjacency_matrix(matrix1,diag = FALSE) 
+plot(g,vertex.color = "#eaff00",vertex.size=30) 
+```
+
+```{r}
+g2 = graph.empty(n=11)
+g2 = add.edges(g2,c(1,2, 2,3, 3,5, 4,5, 5,4, 5,3, 7,9, 7,8, 9,11, 9,1, 11,1)) 
+plot(g2,vertex.label=c(2000,2001,2002,2003,2004,2005,2006, 2008,2010),vertex.color = "#eaff00",vertex.size=25)
+```
+
+4. Display the edges & vertices, the network as matrix and the names of vertices
+
+```{r}
+print(E(g))
+print(V(g))
+```
+
+5. Find the count of vertices and edges of the created graph
+
+```{r}
+print(E(g2))
+print(V(g2))
+```
+
+6. Display the adjacency vertices of each vertex(individual) in the created graph
+
+7. Find the min and max degree of the created graph
+
+```{r}
+print(get.adjacency(g))
+print(get.adjacency(g2))
+V(g)$names = seq(2000,2010) 
+V(g2)$names = c(2000,2001,2002,2003,2004,2005,2006,2008,2010) 
+print(V(g)$names)
+print(V(g2)$names)
+print(vcount(g))
+print(ecount(g))
+print(vcount(g2))
+print(ecount(g2))
+print(get.adjedgelist(g))
+print(get.adjedgelist(g2))
+```
+
+
+8. Create & set vertex attribute property named profit and values(“+”, “-”, “+”, “-”, “+”, “-”,“+”, “-”, “+”)
+
+```{r}
+V(g)$profit =c("+", "-", "+", "-", "+", "-","+","-","+") 
+print(V(g)$profit)
+V(g2)$profit =c("+", "-", "+", "-", "+", "-","+","-","+") 
+print(V(g2)$profit)
+```
+
+9. Create & set vertex attribute property named type and values(either leap or non-leap year)
+
+```{r}
+V(g)[(names %% 4)==0]$type = "leap" 
+V(g)[(names %% 4)!=0]$type = "non-leap" 
+V(g2)[(names %% 4)==0]$type = "leap"
+V(g2)[(names %% 4)!=0]$type = "non-leap" 
+print(V(g)$type)
+print(V(g2)$type)
+```
+
+10. Create & set edge attribute named weight and values (if edge exits in between leap year vertices then 5 else 1 )
+
+```{r}
+g = delete_vertex_attr(g,"names") 
+E(g)$weight = 1
+E(g2)$weight= 1
+E(g)[21]$weight=5 
+E(g)[41]$weight=5 
+E(g)[42]$weight=5
+E(g2)[9]$weight = 5
+```
+
+11. Convert the created un-directed graph into directed graph based on the following rule:
+
+a. edge directed towards high value vertex
+
+b. if any one of the vertex is leap year then put the reverse edge with same weight
+
+12. Display the adjacency matrix of the resultant directed graph.
+
+```{r}
+plot(g,edge.color = E(g)$weight,vertex.size=20,edge.width=E(g)$weight,vertex.color="#c8ff00")
+
+plot(g2,edge.color = E(g2)$weight,vertex.size=20,edge.width=E(g2)$weight,vertex.color="#c8ff00")
+```
+
+
+13. Display the in-degree and out-degree of each vertex of resultant directed graph
+
+```{r}
+print(get.adjacency(g))
+print(get.adjacency(g2))
+print(degree(g,mode="in")) 
+print(degree(g,mode="out")) 
+print(degree(g2,mode="in")) 
+print(degree(g2,mode="out"))
+```

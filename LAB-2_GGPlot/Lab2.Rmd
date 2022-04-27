@@ -1,0 +1,52 @@
+---
+title: "CSE3020 Lab2"
+author: "Faraz Suhail"
+date: "25/01/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Name: "Faraz Suhail"
+## Reg. No.: "19BCE1525"
+
+```{r}
+library(ggplot2)
+library(readxl)
+```
+
+```{r}
+Bank = read_excel("Bank.xlsx")
+head(Bank, 5)
+```
+
+
+```{r}
+ggplot(Bank, aes(x = Age_Groups, y = No_of_Loans))+
+  geom_bar(stat = "identity") + coord_cartesian(ylim = c(0, 8000))
+```
+
+```{r}
+age <- Bank$Age_Groups
+loans <- Bank$No_of_Loans
+bad <- Bank$Bad_Rate
+```
+
+```{r}
+ggplot(Bank) +
+  geom_bar(aes(x=age,y=loans),stat="identity") +
+  geom_line(aes(x=age,y=bad*1600,color = "Bad Rate"),group=1,color="orange") +
+  scale_y_continuous(sec.axis = sec_axis(~.*0.0006,name = "Bad Rate"))
+```
+
+```{r}
+ggplot(Bank) +
+  geom_bar(aes(x=age,y=loans), stat="identity") +
+  geom_line(aes(x=age,y=bad*1600,color = "Bad Rate"),group=1) +
+  scale_y_continuous(sec.axis = sec_axis(~.*0.0006,name = "Bad Rate")) +
+  theme(legend.position = c(1,1), legend.justification = c(1,1)) +
+  scale_color_manual(values=c("orange")) +
+  labs(color = "",x = "Age Group",y = "Number Of Loans")
+```

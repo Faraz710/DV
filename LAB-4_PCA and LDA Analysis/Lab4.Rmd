@@ -1,0 +1,126 @@
+---
+title: "CSE3020 Lab4"
+author: "Faraz Suhail"
+date: "22/02/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Name: "Faraz Suhail"
+## Reg. No.: "19BCE1525"
+
+
+### 1. Use Breast Cancer Wisconsin data set from the UCI Machine learning repo to plot the PCA analysis. Use the ‘prcomp’ function runs PCA on the data.
+
+```{r}
+library(devtools)
+library(MASS)
+library(ggbiplot)
+```
+
+```{r}
+data1 <- read.csv("data.csv")
+data1<-data1[1:32]
+data<-na.omit(data1)
+head(data)
+```
+
+
+```{r}
+cancer.pca <- prcomp(data[3:32], scale. = TRUE)
+print(ggbiplot(cancer.pca, obs.scale = 1, var.scale = 1,
+  groups = data$diagnosis, ellipse = TRUE, circle = TRUE) +scale_color_discrete(name = '')
+  +theme(legend.direction = 'horizontal', legend.position = 'top'))
+```
+
+```{r}
+model1 <- lda(diagnosis~., data = data[2:8])
+model1
+```
+
+```{r}
+model2 <- lda(diagnosis~., data = data[2:32])
+model2
+```
+
+## table of model 1
+```{r}
+predictions <- predict(model1, data = data[3:8])$class
+# summarize accuracy
+table(predictions, data$diagnosis)
+```
+
+## table of model 2
+```{r}
+predictions <- predict(model2, data = data[3:32])$class
+# summarize accuracy
+table(predictions, data$diagnosis)
+```
+
+#### Both the models have some difference in their error measurement. The model 2 trained with more variables have more accuracy.
+
+
+# 2. Use the built-in iris dataset in R to plot the LDA analysis. Use the lda function of the MASS package in R Project the LDA visual output and Compare the LDA and PCA 2D Projection of Iris dataset
+
+```{r}
+data(iris)
+head(iris)
+```
+
+```{r}
+r <- lda(formula = Species ~ ., 
+         data = iris, 
+         prior = c(1,1,1)/3)
+```
+
+
+```{r}
+r$prior
+r$counts
+r$means
+r$scaling
+r$svd
+```
+
+```{r}
+prop = r$svd^2/sum(r$svd^2)
+prop
+```
+
+```{r}
+r2 <- lda(formula = Species ~ ., 
+          data = iris, 
+          prior = c(1,1,1)/3,
+          CV = TRUE)
+head(r2$class)
+head(r2$posterior)
+```
+
+```{r}
+train <- sample(1:150, 75)
+r3 <- lda(Species ~ ., # training model
+          iris, 
+          prior = c(1,1,1)/3, 
+          subset = train)
+plda = predict(object = r, # predictions
+               newdata = iris[-train, ])
+head(plda$class) # classification result
+head(plda$posterior)
+head(plda$x) # LD projections
+```
+
+```{r}
+plda_plot <- cbind(train, data.frame(predict(r3)$x))
+spc2=iris[train,]$Species
+plda_plot <- cbind(plda_plot,spc2)
+ggplot(plda_plot,aes(LD1,LD2)) + geom_point(aes(color=spc2))
+```
+
+```{r}
+cancer.pca <- prcomp(iris[1:4], scale. = TRUE)
+print(ggbiplot(cancer.pca, obs.scale = 1, var.scale = 1,
+               groups = iris$Species) + scale_color_discrete(name = '') + theme(legend.direction = 'horizontal', legend.position = 'top'))
+```

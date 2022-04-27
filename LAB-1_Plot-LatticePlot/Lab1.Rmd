@@ -1,0 +1,61 @@
+---
+title: "CSE3020 Lab1"
+author: "Faraz Suhail"
+date: "19/01/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Name: "Faraz Suhail"
+## Reg. No.: "19BCE1525"
+
+```{r}
+#load needed libraries
+library(lattice)
+```
+
+```{r}
+data<- read.csv("hsb2.csv",stringsAsFactors = F)
+attach(data)
+head(data)
+```
+
+```{r}
+dotplot(factor(math), main="Marks of students in maths")
+```
+
+```{r}
+barchart(factor(race, levels = c("white","african american","hispanic"), labels = c("white","african american","hispanic")), main="Frequency of each race")
+```
+
+```{r}
+gFactor = factor(gender, levels = c("male","female"), labels = c("male","female"))
+
+histogram(gFactor, main="Percentage of each gender")
+histogram(~write | factor(data$ses), data)
+```
+
+```{r}
+densityplot(~math, main="Density of maths marks")
+```
+
+```{r}
+rFactor <- factor(race, levels = c("white","african american","hispanic"), labels = c("white","african american","hispanic"))
+
+bwplot(gFactor~math|rFactor, main="Math marks by gender and race")
+```
+
+```{r}
+splom(data[c(2,3,9,10)])
+```
+
+```{r}
+xyplot(math~science|gFactor*rFactor)
+```
+
+```{r}
+cloud(math~science*id)
+```
